@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from '@/lib/firebase/client-sdk';
 import axios from "axios";
 import { Loader } from "@/components/ui/Loader";
 import { useRouter } from 'next/navigation';
+import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
+import { FirebaseError } from "firebase/app";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -16,6 +18,8 @@ const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<React.ReactNode | null>(null);
+  const handleKeyDown = useRestrictKeys([' ', 'Enter', 'Tab']);
+const [isVerifying, setIsVerifying] = useState(false);
 
   // Render error for username setup
   const renderUsernameSetupError = () => (
@@ -31,13 +35,18 @@ const LoginPage = () => {
   // Render error for email verification
   const renderEmailVerificationError = () => (
     <p className="text-sm text-red-500 text-center">
-      Your email is not verified. Please{" "}
-      <Link href="/helpers/email" className="text-blue-500 underline">
-        verify your email
-      </Link>
+      Your email is not verified. Please check your inbox or{" "}
+      <button
+        onClick={handleSendVerificationEmail}
+        className="text-blue-500 underline"
+        disabled={isVerifying}
+      >
+        click here
+      </button>
       .
     </p>
   );
+
 
   // Render a generic error without any actionable items
   const renderGenericError = () => (
@@ -45,6 +54,36 @@ const LoginPage = () => {
       An unexpected error occurred. Please try again later.
     </p>
   );
+
+
+  const handleSendVerificationEmail = async () => {
+    setIsVerifying(true);
+    setError(null);
+
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await sendEmailVerification(user);
+        router.push('/instructions');
+      } else {
+        setError(
+          <p className="text-sm text-red-500 text-center">
+            No user is currently signed in. Please try logging in again.
+          </p>
+        );
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred.";
+    
+      setError(
+        <p className="text-sm text-red-500 text-center">
+          {`There was an error sending the verification email. Error: ${errorMessage}. Please try again.`}
+        </p>
+      );
+    }finally {
+      setIsVerifying(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +110,26 @@ const LoginPage = () => {
       }
     } catch (err: unknown) {
       // Handle errors
+      if (err instanceof FirebaseError) {
+        if (err.code === "auth/invalid-credential") { // New unified error code
+          setError(
+            <p className="text-sm text-red-500 text-center">
+              Incorrect email or password
+            </p>
+          );
+          return;
+        }
+      }     
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/too-many-requests') {
+          setError(
+            <p className="text-sm text-red-500 text-center">
+              Too many requests. Please wait a moment and try again.
+            </p>
+          );
+          return;
+        }
+      }
       if (axios.isAxiosError(err) && err.response) {
         const errorMessage = err.response.data.message;
 
@@ -141,6 +200,7 @@ const LoginPage = () => {
               id="password"
               type={showPassword ? "text" : "password"}
               value={password}
+              onKeyDown={handleKeyDown} // Attach the key restriction handler
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg
@@ -163,18 +223,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              type="checkbox"
-              className="h-4 w-4 bg-black border-gray-700 rounded"
-            />
-            <label htmlFor="remember-me" className="ml-2 text-sm text-gray-400">
-              Remember me
-            </label>
-          </div>
-
+        <div className="flex items-center justify-between underline">
           <Link href="/forgot-password" className="text-sm text-gray-400 hover:text-white">
             Forgot password?
           </Link>

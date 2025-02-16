@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client-sdk';
 import { Loader } from '@/components/ui/Loader';
+import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
 
 const SetUsernamePage = () => {
   const router = useRouter();
@@ -13,6 +14,8 @@ const SetUsernamePage = () => {
   const [username, setUsername] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [initialCheck, setInitialCheck] = useState(true);
+  const handleKeyDown = useRestrictKeys([' ', 'Enter', 'Tab']);
+  
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -83,6 +86,7 @@ const SetUsernamePage = () => {
             id="username"
             type="text"
             value={username}
+            onKeyDown={handleKeyDown} // Attach the key restriction handler
             onChange={(e) => setUsername(e.target.value)}
             required
             className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent text-base"

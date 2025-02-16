@@ -1,6 +1,6 @@
 "use client";
 
-import { useMediaQuery } from "@/utils/useMedia";
+import { useMediaQuery } from "@/hooks/useMedia";
 import Sidebar from "@/components/main-set/Sidebar";
 import MobileNavbar from "@/components/main-set/MobileNavbar";
 

@@ -7,6 +7,7 @@ import { auth } from '@/lib/firebase/client-sdk';
 import { useRouter } from 'next/navigation';
 import { Loader } from '@/components/ui/Loader';
 import { EmailInput } from '@/components/helpers/EmailInput';
+import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleKeyDown = useRestrictKeys([' ', 'Enter', 'Tab']);
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +101,7 @@ export default function RegisterPage() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown} // Attach the key restriction handler
               required
               className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent text-base pr-12"
             />
@@ -120,6 +124,7 @@ export default function RegisterPage() {
               id="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
+              onKeyDown={handleKeyDown} // Attach the key restriction handler
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:border-transparent text-base pr-12"
