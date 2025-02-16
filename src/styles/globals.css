@@ -1,0 +1,9 @@
+/* Tailwind's base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #000; /* Black background */
+  color: #fff; /* White text to contrast with the dark background */
+}
