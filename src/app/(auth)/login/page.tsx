@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from '@/lib/firebase/client-sdk';
 import axios from "axios";
-import { Loader } from "@/components/ui/Loader";
+import Loader  from "@/components/ui/Loader";
 import { useRouter } from 'next/navigation';
-import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
 import { FirebaseError } from "firebase/app";
+import { PasswordInput } from '@/components/helpers/PasswordInput';
+import { EmailInput } from '@/components/helpers/Email';
+import AuthLink from '@/components/helpers/Redirect-link';
+import { Lock } from 'lucide-react'
 
 const LoginPage = () => {
   const router = useRouter();
@@ -18,15 +20,14 @@ const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<React.ReactNode | null>(null);
-  const handleKeyDown = useRestrictKeys([' ', 'Enter', 'Tab']);
-const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   // Render error for username setup
   const renderUsernameSetupError = () => (
     <p className="text-sm text-red-500 text-center">
       Your account is incomplete. Please{" "}
       <Link href="/helpers/username" className="text-blue-500 underline">
-        set up your username
+        finish you account creation
       </Link>
       .
     </p>
@@ -161,9 +162,9 @@ const [isVerifying, setIsVerifying] = useState(false);
   return (
     <div className="space-y-6 bg-black/30 p-6 sm:p-8 rounded-lg border border-gray-800">
       <div className="space-y-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-white text-center">Login</h1>
-        <p className="text-sm text-gray-400 text-center">Sign in to continue</p>
-      </div>
+  <Lock className="text-white w-10 h-10 mx-auto" /> 
+  <p className="text-sm text-gray-400 text-center">Sign in to continue</p>
+</div>
 
       {/* Error Display */}
       {error && (
@@ -174,54 +175,13 @@ const [isVerifying, setIsVerifying] = useState(false);
 
       {/* Form */}
       <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-1.5">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg
-              text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-              focus:ring-gray-600 focus:border-transparent text-base"
-            placeholder="Email"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-1.5">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onKeyDown={handleKeyDown} // Attach the key restriction handler
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-black border border-gray-700 rounded-lg
-                text-white placeholder-gray-400 focus:outline-none focus:ring-2 
-                focus:ring-gray-600 focus:border-transparent text-base pr-12"
-              placeholder="Password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 
-                hover:text-white focus:outline-none transition-colors duration-200"
-            >
-              {showPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
-            </button>
-          </div>
-        </div>
+        <EmailInput value={email} onChange={(e) => setEmail(e.target.value)} />
+        <PasswordInput
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  showPassword={showPassword}
+  setShowPassword={setShowPassword}
+/>
 
         <div className="flex items-center justify-between underline">
           <Link href="/forgot-password" className="text-sm text-gray-400 hover:text-white">
@@ -246,15 +206,11 @@ const [isVerifying, setIsVerifying] = useState(false);
         </button>
       </form>
 
-      {/* Footer */}
-      <div className="pt-2">
-        <p className="text-sm text-gray-400 text-center">
-          Don&apos;t have an account?{' '}
-          <Link href="/sign-up" className="font-medium text-white hover:text-gray-200">
-            Sign up
-          </Link>
-        </p>
-      </div>
+      <AuthLink 
+       text="Don't have an account?" 
+      linkText="Sign up" 
+       linkHref="/sign-up" 
+      />
     </div>
   );
 };

@@ -6,7 +6,7 @@ import { applyActionCode, getAuth } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { CheckCircle, XCircle, Info } from 'lucide-react';
 import { app } from '@/lib/firebase/client-sdk';
-import { Loader } from '@/components/ui/Loader';
+import  Loader  from '@/components/ui/Loader';
 
 export default function VerifyEmailPage() {
   const router = useRouter();

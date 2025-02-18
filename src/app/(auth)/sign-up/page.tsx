@@ -5,9 +5,10 @@ import { Eye, EyeOff } from 'lucide-react';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client-sdk';
 import { useRouter } from 'next/navigation';
-import { Loader } from '@/components/ui/Loader';
+import Loader from '@/components/ui/Loader';
 import { EmailInput } from '@/components/helpers/EmailInput';
-import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
+import { useRestrictKeys } from '@/hooks/useRestrictKeys';
+import AuthLink from '@/components/helpers/Redirect-link';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const handleKeyDown = useRestrictKeys([' ', 'Enter', 'Tab']);
+  const handleKeyDown = useRestrictKeys([' ']);
 
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -178,14 +179,12 @@ export default function RegisterPage() {
       </form>
 
       {/* Footer */}
-      <div className="pt-2">
-        <p className="text-sm text-gray-400 text-center">
-          Already have an account?{' '}
-          <Link href="/login" className="font-medium text-white hover:text-gray-200">
-            Sign in
-          </Link>
-        </p>
-      </div>
+      <AuthLink 
+  text="Already have an account?" 
+  linkText="Login" 
+  linkHref="/login" 
+/>
+
     </div>
   );
 }

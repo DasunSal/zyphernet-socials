@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase/client-sdk';
-import { Loader } from '@/components/ui/Loader';
+import  Loader  from '@/components/ui/Loader';
 import { useRestrictKeys } from '@/hooks/useRestrictKeys'; // Import custom hook
 
 const SetUsernamePage = () => {

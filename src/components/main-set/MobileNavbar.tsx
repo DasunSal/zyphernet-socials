@@ -36,8 +36,7 @@ export default function MobileLayout() { // Removed { children }
         </nav>
       )}
 
-      {/* Bottom Navbar (Always Visible) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800">
+<nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50">
         <div className="flex items-center justify-around h-16">
           {mobileNavigationItems.map(({ icon: Icon, label, href }) => (
             <Link
